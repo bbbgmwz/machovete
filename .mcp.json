@@ -3,6 +3,10 @@
     "supabase": {
       "type": "http",
       "url": "https://mcp.supabase.com/mcp?project_ref=pizflsflslzauyryihhq"
+    },
+    "sportmonks-docs": {
+      "type": "http",
+      "url": "https://docs.sportmonks.com/v3/~gitbook/mcp"
     }
   }
 }

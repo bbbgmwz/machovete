@@ -74,7 +74,10 @@ if (missingAgentText.length > 0) {
 }
 
 const mcp = readFileSync(join(root, ".mcp.json"), "utf8");
-const requiredMcpText = ["https://mcp.supabase.com/mcp?project_ref=pizflsflslzauyryihhq"];
+const requiredMcpText = [
+  "https://mcp.supabase.com/mcp?project_ref=pizflsflslzauyryihhq",
+  "https://docs.sportmonks.com/v3/~gitbook/mcp"
+];
 const missingMcpText = requiredMcpText.filter((text) => !mcp.includes(text));
 
 if (missingMcpText.length > 0) {
