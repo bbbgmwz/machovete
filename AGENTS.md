@@ -68,6 +68,10 @@ docs/
   localization.md
   mobile-release.md
   quality-gates.md
+  agent-skills.md
+.agents/skills/       # Repo-local agent skills approved for Machovete
+.mcp.json             # Repo-local MCP server declarations
+skills-lock.json      # Locked repo-local skills installed through skills CLI
 ```
 
 Use `pnpm` workspaces and Turborepo for JavaScript/TypeScript orchestration.
@@ -363,6 +367,7 @@ Before making changes, inspect:
 - Design tokens
 - Localization files
 - Existing feature docs
+- `docs/agent-skills.md` for optional skill/tooling upgrades before new platform work
 
 When implementing a change:
 
