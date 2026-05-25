@@ -105,3 +105,56 @@ Provider comparison for this feature:
 - Sportmonks is stronger for VAR-confirmed goal semantics because it documents `GOAL_UNDER_REVIEW -> GOAL_CONFIRMED` or `GOAL_DISALLOWED` event chains and `sort_order`.
 - API-Football is usable for delayed goal notifications and VAR cancellation handling, but based on the checked docs it looks less explicit than Sportmonks for "goal confirmed" semantics.
 - Neither provider currently proves "send only after kickoff restarted" from documentation alone. Real live-match sampling is required.
+
+## Verified Goal Notification Strategy
+
+The target product feature is not "instant goal". It is a user-selectable "verified goal" notification mode that avoids common false-positive goal alerts caused by VAR, offside, fouls, handball, or score rollback.
+
+Because checked providers do not document a kickoff/restart-after-goal event, verification must be inferred by our ingestion backend.
+
+State machine:
+
+- `candidate`: A possible goal is detected from score increase, `GOAL`, `OWNGOAL`, scored `PENALTY`, or API-Football `Goal`.
+- `under_review`: A provider emits goal review, VAR review, or ambiguous VAR activity related to the candidate.
+- `confirmed`: A provider emits explicit goal confirmation, or the goal remains stable and qualified post-goal play evidence appears.
+- `cancelled`: A provider emits goal cancelled/disallowed, offside/foul/handball cancellation, or the score rolls back.
+- `expired`: No reliable confirmation arrives inside the UX window.
+
+Do not use these as proof of resumed play:
+
+- Substitutions. A substitution can happen during the stoppage after a goal, during VAR delay, or before kickoff resumes.
+- Cards. Cards can be given for celebration, dissent, or VAR-related incidents before play resumes.
+- The match clock alone. Football match time can continue advancing while play is delayed, and provider `elapsed` values can advance at minute granularity without proving restart.
+- Score persistence alone in the same polling cycle.
+
+Potential positive resume signals:
+
+- Sportmonks `GOAL_CONFIRMED` after `GOAL_UNDER_REVIEW`, when present.
+- Sportmonks `ballCoordinates` entry with a `timer` later than the goal time and new ball movement away from a static center restart position. Sportmonks documents approximately 568 ball-coordinate entries per match on average, around 6.3 per minute, with about 15 seconds of delay, but availability is limited to selected leagues and fixtures.
+- Sportmonks `pressure` or trend data with a new minute after the candidate goal. Pressure Index is calculated from live match statistics such as attacks, shots, possession, attacking third entries, and dangerous attacks, but it is an add-on and must be tested for timeliness.
+- A provider event that is clearly part of active play after the goal, if real payloads prove such events exist. Do not assume substitutions/cards qualify.
+
+MVP algorithm hypothesis:
+
+1. Detect a goal candidate and record provider, fixture, team, player, event ID, event time, sort order, score before/after, and detection timestamp.
+2. Hold push notification for the user's verified-goal mode.
+3. Poll the highest-resolution provider payload available for that fixture for a short verification window.
+4. Immediately cancel if a disallowed/cancelled/score-rollback signal appears.
+5. Immediately confirm if an explicit provider confirmation appears.
+6. Otherwise confirm only after post-goal play evidence appears and the score is still stable.
+7. If no strong evidence appears inside the product window, mark `expired` or fall back to a configurable provider-stable rule. Do not send a stale goal notification several minutes later.
+
+Initial UX thresholds to validate, not final rules:
+
+- Target P50 verified-goal delay: under 30 seconds.
+- Target P90 verified-goal delay: under 60 seconds.
+- Hard maximum notification delay: 90 seconds unless explicitly approved after testing.
+- If real data regularly needs 2-5 minutes to verify, the feature should not be marketed as a normal goal notification. It should be a separate "delayed verified goals" mode, with instant goals still available for users who prefer speed.
+
+Real-data validation plan:
+
+- Capture every live polling response for selected fixtures around goals, VAR reviews, cancelled goals, and restarts.
+- Measure `candidate_detected_at -> provider_confirmed_at`, `candidate_detected_at -> resume_evidence_at`, and `candidate_detected_at -> cancellation_at`.
+- Record provider update order, event sort order, score changes, score rollbacks, `periods` timer changes, `ballCoordinates.timer`, pressure/trend updates, and API-Football event details.
+- Compare Sportmonks and API-Football on the same fixtures where possible.
+- Build a small labelled dataset before implementing user-facing push notifications.
