@@ -24,6 +24,12 @@ The product must be fast, reliable, provider-agnostic, highly localized for Bulg
 
 The API contract is the source of truth, not the frontend.
 
+This repository, directory, Codex session, MCP configuration, Supabase project, Vercel project, and Git remote are for Machovete only.
+
+Never touch staging from this repo. Do not read from, write to, deploy to, migrate, query, seed, reset, configure, or authenticate against any staging environment, staging database, staging Supabase project, staging Vercel project, staging branch, staging app, or path/repo named `staging` while working in `/Users/admin/hack/machovete`. If a prompt mentions staging or could affect staging, stop and ask for explicit clarification before running tools.
+
+The Supabase MCP/project ref for this repo must stay isolated from other Codex Supabase connections. Do not replace, reuse, or modify another repo's Supabase MCP configuration for Machovete.
+
 Do not treat this as three separate frontend products. Build one product with:
 
 - One shared backend
