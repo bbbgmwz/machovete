@@ -1,0 +1,17 @@
+{
+  "name": "machovete",
+  "private": true,
+  "version": "0.0.0",
+  "packageManager": "pnpm@10.28.0",
+  "scripts": {
+    "check": "node scripts/check-foundation.mjs",
+    "check:workspaces": "turbo run check",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test"
+  },
+  "devDependencies": {
+    "turbo": "^2.6.1"
+  }
+}

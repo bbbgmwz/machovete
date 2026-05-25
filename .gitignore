@@ -1,0 +1,62 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+.turbo/
+.next/
+out/
+dist/
+build/
+coverage/
+.vercel/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment files
+.env
+.env.*
+!.env.example
+!.env.test
+
+# Supabase local runtime
+supabase/.branches/
+supabase/.temp/
+supabase/.env
+
+# macOS / editors
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# iOS
+DerivedData/
+*.xcuserstate
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+*.ipa
+*.dSYM.zip
+*.dSYM
+*.mobileprovision
+*.p12
+
+# Android
+.gradle/
+local.properties
+*.apk
+*.aab
+*.jks
+*.keystore
+
+# Temporary files
+tmp/
+temp/
+.cache/
